@@ -3,7 +3,6 @@ package Controller;
 import Model.DAO;
 
 import java.sql.*;
-import java.util.Scanner;
 
 public class BookController {
 
@@ -34,8 +33,47 @@ public class BookController {
         }
     }
 
-    private void editbook() {
-
+    private void addBook(String name, String loaisach, String tacgia,String nhaxuatban, String namxuatban, int soluong,double giatien ) throws SQLException {
+        Connection connection = DAO.getConnection();
+        String SQL = "INSERT INTO books (name, loaisach, tacgia_id, nhaxuatban_id, namxuatban, soluong, giatien) values (?,?,?,?,?,?,?)";
+        String SQLTacGia = "SELECT tacgia_id FROM tacgia WHERE name = ?";
+        String SQLNhaXuatBan = "SELECT nhaxuatban_id FROM nhaxuatban WHERE nhaxuatban =?";
+        try {
+            PreparedStatement check1 = connection.prepareStatement(SQLTacGia);
+            PreparedStatement check2 = connection.prepareStatement(SQLNhaXuatBan);
+            check1.setString(1,tacgia); check2.setString(1,nhaxuatban);
+            ResultSet resultSet1 = check1.executeQuery(); ResultSet resultSet2 = check2.executeQuery();
+            int tacgia_id;
+            if (resultSet1.next()){
+                tacgia_id = resultSet1.getInt("tacgia_id");
+            } else {
+                throw new SQLException("Không tìm thấy ID của tác giả.");
+            }
+            int nhaxuatban_id;
+            if(resultSet2.next()){
+                nhaxuatban_id = resultSet2.getInt("nhaxuatban_id");
+            } else {
+                throw new SQLException("Không tìm thấy ID của nhà xuất bản.");
+            }
+            PreparedStatement insert = connection.prepareStatement(SQL);
+            insert.setString(1,name);
+            insert.setString(2,loaisach);
+            insert.setString(3,tacgia = String.valueOf(tacgia_id));
+            insert.setString(4,nhaxuatban = String.valueOf(nhaxuatban_id));
+            insert.setString(5,namxuatban);
+            insert.setInt(6,soluong);
+            insert.setDouble(7,giatien);
+            insert.executeUpdate();
+            System.out.println("Thêm sách thành công");
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void printBookInfo() throws SQLException {

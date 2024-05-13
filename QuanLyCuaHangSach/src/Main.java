@@ -3,8 +3,6 @@ import Model.Book;
 import Model.DAO;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -35,6 +33,9 @@ public class Main {
                 String tacgia = scanner.nextLine();
                 bookController.addTacGia(tacgia);
                 break;
+            case 4:
+                scanner.nextLine();
+                System.out.println("Nhap thong tin sach");
         }
     }
 
