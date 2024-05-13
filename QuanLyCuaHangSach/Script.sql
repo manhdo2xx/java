@@ -61,3 +61,28 @@ alter table books add constraint FK_SACH_NHAXUATBAN foreign key (nhaxuatban_id) 
 
 
 
+insert into loaisach (loaisach)
+values ('Khoa hoc'),
+ 	   ('Truyen tranh'),
+	   ('Tieu thuyet'),
+	   ('Lich su'),
+	   ('Ngoai ngu');
+
+
+insert into tacgia (name)
+values 	('Nam Cao'),
+		('Nguyen ngoc ngan'),
+		('Ngo tat to'),
+		('Long Ngo');
+
+insert into nhaxuatban (nhaxuatban)
+values 	('Kim Dong'),
+		('Kim Nguu'),
+		('Thoi Dai'),
+		('Van Hoa');
+
+
+INSERT INTO books (name, loaisach, tacgia_id, nhaxuatban_id, namxuatban, soluong, giatien)
+VALUES 	('Bach luyen thanh than', 'Truyen tranh', 4, 2, '2012-12-12', 10, 20000),
+		('Vat ly', 'Khoa hoc',1,1,'2012-12-12',10,30000),
+		('Connan','Truyen tranh',4,2,'2010-10-10',100,20000);
