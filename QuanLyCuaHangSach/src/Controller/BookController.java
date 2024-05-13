@@ -1,68 +1,99 @@
 package Controller;
 
-import Model.Book;
+import Model.DAO;
 
-import java.util.List;
+import java.sql.*;
 import java.util.Scanner;
 
 public class BookController {
-    private List<Book> bookDatabase;
-    private final Scanner scanner;
 
-    public BookController(List<Book> bookDatabase) {
-        this.bookDatabase = bookDatabase;
-        this.scanner = new Scanner(System.in);
-    }
-
-    public void addBook() {
-        System.out.println("Nhập thông tin sách mới:");
-        System.out.print("Mã sách: ");
-        String maSach = scanner.nextLine();
-        System.out.print("Tên sách: ");
-        String tenSach = scanner.nextLine();
-        System.out.print("Loại sách: ");
-        String loaiSach = scanner.nextLine();
-        System.out.print("Tên tác giả: ");
-        String tenTacGia = scanner.nextLine();
-        System.out.print("Nhà xuất bản: ");
-        String nhaXuatBan = scanner.nextLine();
-        System.out.print("Năm xuất bản: ");
-        double namXuatBan = scanner.nextDouble();
-        System.out.print("Số lượng: ");
-        double soLuong = scanner.nextDouble();
-        System.out.print("Giá tiền: ");
-        double giaTien = scanner.nextDouble();
-        Book newBook = new Book(maSach, tenSach, loaiSach, tenTacGia, nhaXuatBan, namXuatBan, soLuong, giaTien);
-        bookDatabase.add(newBook);
-        System.out.println("Sách mới đã được thêm vào danh sách.");
-        printTable();
-        printBookInfo(newBook);
-    }
-
-    private void editbook(){
-
-    }
-
-    private void printBookInfo(Book book) {
-        System.out.println("Thông tin sách:");
-        System.out.println("Mã sách: " + book.getMaSach());
-        System.out.println("Tên sách: " + book.getTenSach());
-        System.out.println("Loại sách: " + book.getLoaiSach());
-        System.out.println("Tên tác giả: " + book.getTenTacGia());
-        System.out.println("Nhà xuất bản: " + book.getNhaXuatBan());
-        System.out.println("Năm xuất bản: " + book.getNamXuatBan());
-        System.out.println("Số lượng: " + book.getSoLuong());
-        System.out.println("Giá tiền: " + book.getGiaTien());
-    }
-    public void printTable() {
-        System.out.println("Mã sách        Tên sách     Loại sách   Tác giả Nhà xuất bản    Năm xuất bản    Số lượng    Giá tiền");
-        for (Book book : bookDatabase) {
-            System.out.printf("%-8s %-16s %-12s %-12s %-14s %-14f %-9f $%.2f%n",
-                    book.getMaSach(), book.getTenSach(), book.getLoaiSach(), book.getTenTacGia(), book.getNhaXuatBan(),
-                    book.getNamXuatBan(), book.getSoLuong(), book.getGiaTien());
+    public void addTacGia(String tenTacGia) {
+        Connection connection = DAO.getConnection();
+        String SQLcheck = "SELECT tacgia_id FROM tacgia WHERE name = ?";
+        String SQL = "INSERT INTO tacgia (name) VALUES (?)";
+        try {
+            PreparedStatement check = connection.prepareStatement(SQLcheck);
+            check.setString(1, tenTacGia);
+            ResultSet resultSet = check.executeQuery();
+            if (!resultSet.next()) {
+                PreparedStatement insert = connection.prepareStatement(SQL);
+                insert.setString(1, tenTacGia);
+                insert.executeUpdate();
+                System.out.println("Thêm tác giả thành công");
+            } else {
+                System.out.println("Thêm tác giả thành công");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void editbook() {
 
     }
 
+    public void printBookInfo() throws SQLException {
+        Connection connection = DAO.getConnection();
+        String SQL = "SELECT books.book_id, books.name AS name, books.loaisach, \n" +
+                "       tacgia.name AS tacgia, nhaxuatban.nhaxuatban AS nhaxuatban, \n" +
+                "       books.namxuatban, books.soluong, books.giatien\n" +
+                "FROM books\n" +
+                "INNER JOIN tacgia ON books.tacgia_id = tacgia.tacgia_id\n" +
+                "INNER JOIN nhaxuatban ON books.nhaxuatban_id = nhaxuatban.nhaxuatban_id;\n";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(SQL);
+            // In ra tiêu đề của bảng
+            System.out.println("Sách trong cửa hàng :");
+            System.out.printf("%-10s %-30s %-20s %-20s %-20s %-20s %-20s %-20s \n", "ID", "Tên sách", "Loại sách", "Tác giả", "Nhà xuất bản", "Năm xuât bản", "Số lương", "Giá tiền");
+
+            // Duyệt qua các kết quả và in ra thông tin của từng cuốn sách
+            while (resultSet.next()) {
+                int id = resultSet.getInt("book_id");
+                String name = resultSet.getString("name");
+                String loaisach = resultSet.getString("loaisach");
+                String tacgia = resultSet.getString("tacgia");
+                String nhaxuatban = resultSet.getString("nhaxuatban");
+                String namxuatban = String.valueOf(resultSet.getDate("namxuatban"));
+                int soluong = resultSet.getInt("soluong");
+                double giatien = resultSet.getDouble("giatien");
+
+                // In ra thông tin của từng cuốn sách
+                System.out.printf("%-10s %-30s %-20s %-20s %-20s %-20s %-20s %-20s \n", id, name, loaisach, tacgia, nhaxuatban, namxuatban, soluong, giatien);
+            }
+            resultSet.close();
+            statement.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void printTacGiaInfo() throws SQLException {
+        Connection connection = DAO.getConnection();
+        String SQL = "SELECT * FROM tacgia";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(SQL);
+            // In ra tiêu đề của bảng
+            System.out.println("Thông tin tác giả :");
+            System.out.printf("%-10s %-20s \n", "ID", "Tên tác giả");
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("tacgia_id");
+                String name = resultSet.getString("name");
+                System.out.printf("%-10s %-20s \n", id, name);
+            }
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 

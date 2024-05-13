@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Book {
+    private int id;
     private String maSach;
     private String tenSach;
     private String loaiSach;
@@ -15,7 +16,8 @@ public class Book {
     private double giaTien;
 
 
-    public Book(String maSach, String tenSach, String loaiSach, String tenTacGia, String nhaXuatBan, double namXuatBan, double soLuong, double giaTien) {
+    public Book(int id, String maSach, String tenSach, String loaiSach, String tenTacGia, String nhaXuatBan, double namXuatBan, double soLuong, double giaTien) {
+        this.id = id;
         this.maSach = maSach;
         this.tenSach = tenSach;
         this.loaiSach = loaiSach;
@@ -90,7 +92,12 @@ public class Book {
         this.giaTien = giaTien;
     }
 
+    public int getId() {
+        return id;
+    }
 
-
+    public void setId(int id) {
+        this.id = id;
+    }
 
 }
